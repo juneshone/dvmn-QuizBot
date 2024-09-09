@@ -18,9 +18,6 @@ from telegram.ext import (
 from collecting_content import get_content
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
 logger = logging.getLogger('telegram_bot')
 
 
@@ -123,7 +120,15 @@ def cancel(update, _):
 def main():
     env = Env()
     env.read_env()
+
+    logging.basicConfig(
+        format='%(asctime)s - %(funcName)s -  %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
+    logger.setLevel(logging.DEBUG)
+
     try:
+        logger.info('Telegram-бот запущен')
         updater = Updater(env.str('TELEGRAM_BOT_TOKEN'))
         redis_server = redis.StrictRedis(
             host=env.str('REDIS_HOST'),
