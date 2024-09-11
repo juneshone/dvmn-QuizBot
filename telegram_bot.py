@@ -43,10 +43,10 @@ def start(update, _):
     return States.CHOOSING
 
 
-def handle_new_question_request(update, _, redis_db):
+def handle_new_question_request(update, _, redis_db, content_folder):
     user = update.message.from_user
     logger.info('%s: %s', user.first_name, update.message.text)
-    quiz_content = get_content()
+    quiz_content = get_content(content_folder)
     question, answer = random.choice(list(quiz_content.items()))
     redis_db.set(user.id, answer)
 
@@ -129,7 +129,7 @@ def main():
 
     try:
         logger.info('Telegram-бот запущен')
-        updater = Updater(env.str('TELEGRAM_BOT_TOKEN'))
+        content_folder = env.str('CONTENT_FOLDER')
         redis_server = redis.StrictRedis(
             host=env.str('REDIS_HOST'),
             port=env.int('REDIS_PORT'),
@@ -137,6 +137,7 @@ def main():
             decode_responses=True,
             encoding='KOI8-R'
         )
+        updater = Updater(env.str('TELEGRAM_BOT_TOKEN'))
         dispatcher = updater.dispatcher
 
         conv_handler = ConversationHandler(
@@ -146,17 +147,27 @@ def main():
                 States.CHOOSING: [
                     MessageHandler(
                         Filters.regex('^Новый вопрос$'),
-                        partial(handle_new_question_request, redis_db=redis_server),
+                        partial(
+                            handle_new_question_request,
+                            redis_db=redis_server,
+                            content_folder=content_folder
+                        ),
                     )
                 ],
                 States.SCORE: [
                     MessageHandler(
                         Filters.regex('^Сдаться$'),
-                        partial(handle_give_up, redis_db=redis_server),
+                        partial(
+                            handle_give_up,
+                            redis_db=redis_server
+                        ),
                     ),
                     MessageHandler(
                         Filters.text,
-                        partial(handle_solution_attempt, redis_db=redis_server),
+                        partial(
+                            handle_solution_attempt,
+                            redis_db=redis_server
+                        ),
                     )
                 ],
             },

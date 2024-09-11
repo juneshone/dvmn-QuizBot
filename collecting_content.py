@@ -2,10 +2,9 @@ import os
 import re
 
 
-def get_content():
-    path = 'quiz-questions'
-    for file in os.listdir(path):
-        file_path = f'{path}/{file}'
+def get_content(content_folder):
+    for file in os.listdir(content_folder):
+        file_path = f'{content_folder}/{file}'
         quiz_content = {}
         with open(file_path, 'r', encoding='KOI8-R') as file:
             text_parts = file.read().split('\n\n')

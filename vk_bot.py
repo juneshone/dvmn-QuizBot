@@ -15,11 +15,11 @@ from collecting_content import get_content
 logger = logging.getLogger('vk_bot')
 
 
-def handle_new_question_request(event, vk_api, redis_db, keyboard):
+def handle_new_question_request(event, vk_api, redis_db, keyboard, content_folder):
     user = event.user_id
     username = vk_api.users.get(user_ids=user)[0]['first_name']
     logger.info('%s(%s): %s', username, user, event.text)
-    quiz_content = get_content()
+    quiz_content = get_content(content_folder)
     question, answer = random.choice(list(quiz_content.items()))
     redis_db.set(user, answer)
 
@@ -82,6 +82,7 @@ def main():
 
     try:
         logger.info('VK-бот запущен')
+        content_folder = env.str('CONTENT_FOLDER')
         vk_session = vk.VkApi(token=env.str('VK_GROUP_TOKEN'))
         vk_api = vk_session.get_api()
         redis_server = redis.StrictRedis(
@@ -118,7 +119,9 @@ def main():
                     )
                     continue
                 if event.text == 'Новый вопрос':
-                    handle_new_question_request(event, vk_api, redis_server, keyboard)
+                    handle_new_question_request(
+                        event, vk_api, redis_server, keyboard, content_folder
+                    )
                     continue
                 if event.text == 'Сдаться':
                     handle_give_up(event, vk_api, redis_server, keyboard)
