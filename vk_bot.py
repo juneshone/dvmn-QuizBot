@@ -117,24 +117,21 @@ def main():
                                 'Чтобы продолжить, нажми «Новый вопрос»'
                                 'Чтобы прекратить разговор, нажми «Завершить диалог»'
                     )
-                    continue
-                if event.text == 'Новый вопрос':
+                elif event.text == 'Новый вопрос':
                     handle_new_question_request(
                         event, vk_api, redis_server, keyboard, content_folder
                     )
-                    continue
-                if event.text == 'Сдаться':
+                elif event.text == 'Сдаться':
                     handle_give_up(event, vk_api, redis_server, keyboard)
-                    continue
-                if event.text == 'Завершить':
+                elif event.text == 'Завершить':
                     vk_api.messages.send(
                         peer_id=event.user_id,
                         random_id=get_random_id(),
                         message='Мое дело предложить - Ваше отказаться.\n'
                                 'До встречи!'
                     )
-                    continue
-                handle_solution_attempt(event, vk_api, redis_server, keyboard)
+                else:
+                    handle_solution_attempt(event, vk_api, redis_server, keyboard)
     except Exception as err:
         logger.error(err, exc_info=True)
 
