@@ -8,6 +8,7 @@ def get_content(content_folder):
         quiz_content = {}
         with open(file_path, 'r', encoding='KOI8-R') as content_file:
             text_parts = content_file.read().split('\n\n')
+            content_file.close()
             for text_part in text_parts:
                 if 'Вопрос' in text_part:
                     question = re.split(':', text_part, maxsplit=1)[1].replace('\n', ' ')
