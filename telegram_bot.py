@@ -43,10 +43,9 @@ def start(update, _):
     return States.CHOOSING
 
 
-def handle_new_question_request(update, _, redis_db, content_folder):
+def handle_new_question_request(update, _, redis_db, quiz_content):
     user = update.message.from_user
     logger.info('%s: %s', user.first_name, update.message.text)
-    quiz_content = get_content(content_folder)
     question, answer = random.choice(list(quiz_content.items()))
     redis_db.set(user.id, answer)
 
@@ -130,6 +129,7 @@ def main():
     try:
         logger.info('Telegram-бот запущен')
         content_folder = env.str('CONTENT_FOLDER')
+        quiz_content = get_content(content_folder)
         redis_server = redis.StrictRedis(
             host=env.str('REDIS_HOST'),
             port=env.int('REDIS_PORT'),
@@ -150,7 +150,7 @@ def main():
                         partial(
                             handle_new_question_request,
                             redis_db=redis_server,
-                            content_folder=content_folder
+                            quiz_content=quiz_content
                         ),
                     )
                 ],
