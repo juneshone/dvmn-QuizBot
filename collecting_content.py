@@ -3,9 +3,9 @@ import re
 
 
 def get_content(content_folder):
+    quiz_content = {}
     for file in os.listdir(content_folder):
         file_path = os.path.join(content_folder, file)
-        quiz_content = {}
         with open(file_path, 'r', encoding='KOI8-R') as content_file:
             text = content_file.read()
             text_parts = text.split('\n\n')
@@ -15,4 +15,4 @@ def get_content(content_folder):
                 if 'Ответ' in text_part:
                     answer = re.split(':', text_part, maxsplit=1)[1].replace('\n', ' ')
                     quiz_content[question] = answer
-        return quiz_content
+    return quiz_content
